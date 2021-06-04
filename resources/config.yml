@@ -1,0 +1,37 @@
+---
+# Welcome to CustomDrop by refaltor
+
+# ---
+# Configuration explanation :
+#---
+
+
+# FRANCE
+#---
+# 'block' permet d'ajouter tout les block que vous voulez pour ensuite les parametré comme vous voulez
+# 'drops' permet d'ajouter tout les drops que vous voulez au block associé avec une certaine mise en forme :
+# - id:meta:amount:chance
+# si chance = 1, le drop se fera a répétition, et si il est sur 0 sa provoquera une erreur donc bien faire attention !
+# ---
+
+
+# ENGLISH
+#---
+# 'block' allows you to add all the blocks you want and then the parameters as you want
+# 'drops' lets you add all the drops you want to the block associated with a certain shape :
+# - id:meta:amount:chance
+# si chance = 1, le drop will be repeated, and if it is on 0 its will cause an error so be careful !
+# ---
+
+
+block:
+  "1:0": # stone
+    drops:
+      - "366:0:1:2"
+      - "1:0:64:2"
+
+  "4:0": # cobblestone
+    drops:
+      - "366:0:1:2"
+      - "1:0:64:2"
+...
