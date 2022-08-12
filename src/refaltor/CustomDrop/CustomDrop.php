@@ -11,7 +11,7 @@ use pocketmine\plugin\PluginBase;
 
 class CustomDrop extends PluginBase implements Listener
 {
-    private const ITEM_PARSE_WARN = "There is no such item with name "
+    private const ITEM_PARSE_WARN = "There is no such item with name ";
 
     public function onEnable() : void
     {
