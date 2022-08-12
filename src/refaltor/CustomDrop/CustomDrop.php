@@ -2,31 +2,57 @@
 
 namespace refaltor\CustomDrop;
 
-use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
-use pocketmine\item\Item;
+use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\item\LegacyStringToItemParser;
+use pocketmine\item\LegacyStringToItemParserException;
+use pocketmine\item\StringToItemParser;
 use pocketmine\plugin\PluginBase;
 
 class CustomDrop extends PluginBase implements Listener
 {
-    public function onEnable()
+    private const ITEM_PARSE_WARN = "There is no such item with name "
+
+    public function onEnable() : void
     {
         $this->saveResource("config.yml");
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
-    public function onBreak(BlockBreakEvent $event)
+    public function onBreak(BlockBreakEvent $event) : void
     {
         $block = $event->getBlock();
         foreach ($this->getConfig()->get("block") as $id => $value)
         {
-            if ($block->getId() . ":" . $block->getDamage() === $id) {
-            	foreach ($value['drops'] as $drops){
-            		$item = explode(":", $drops);
-            		if (mt_rand(1, $item[3]) === 1){
-            			$event->setDrops([Item::get($item[0], $item[1], $item[2])]);
-					}
-				}
+            $item = null;
+            $id = (string)$id;
+            try{
+                $item = StringToItemParser::getInstance()->parse($id) ?? LegacyStringToItemParser::getInstance()->parse($id);
+            }catch(LegacyStringToItemParserException){
+            }
+            if ($item === null) {
+                $this->getLogger()->warn(self::ITEM_PARSE_WARN . $id);
+            }
+
+            if ($block->asItem()->equals($item)) {
+                foreach ($value['drops'] as $drops){
+                    $newItem = explode(":", $drops);
+                    $chance = (int)array_pop($newItem);
+                    $count = (int)array_pop($newItem);
+                    $drops = implode(":", $newItem);
+
+                    if (mt_rand(1, $chance) === 1){
+                        try{
+                            $newDrops = StringToItemParser::getInstance()->parse($drops) ?? LegacyStringToItemParser::getInstance()->parse($drops);
+                        }catch(LegacyStringToItemParserException){
+                        }
+                        if ($item === null) {
+                            $this->getLogger()->warn(self::ITEM_PARSE_WARN . $drops);
+                        } else {
+                            $event->setDrops([$newDrops->setCount($count)]);
+                        }
+                    }
+                }
             }
         }
     }
